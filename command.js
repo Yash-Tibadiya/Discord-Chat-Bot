@@ -16,7 +16,19 @@ const commands = [
       {
         type: 3, // STRING type
         name: "prompt",
-        description: "The prompt to send to OpenAI",
+        description: "The prompt to get an answer",
+        required: true,
+      },
+    ],
+  },
+  {
+    name: "imagine",
+    description: "Generate an image using OpenAI",
+    options: [
+      {
+        type: 3, // STRING type
+        name: "prompt",
+        description: "The prompt to generate an image",
         required: true,
       },
     ],

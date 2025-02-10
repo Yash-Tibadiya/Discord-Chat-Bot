@@ -1,6 +1,9 @@
 const { Client, GatewayIntentBits } = require("discord.js");
 require("dotenv").config();
 const OpenAI = require("openai");
+const axios = require("axios");
+const fs = require("fs");
+const path = require("path");
 
 const TOKEN = process.env.TOKEN;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -38,12 +41,41 @@ client.on("interactionCreate", async (interaction) => {
           model: "gpt-4o",
           store: true,
         });
-        await interaction.editReply(
-          completion.choices[0].message.content.trim()
-        );
+        const replyContent = completion.choices[0].message.content.trim();
+        if (replyContent.length > 2000) {
+          const parts = replyContent.match(/[\s\S]{1,2000}/g); // Split into chunks of 2000 characters
+          for (const part of parts) {
+            await interaction.followUp(part);
+          }
+        } else {
+          await interaction.editReply(replyContent);
+        }
       } catch (error) {
         console.error(error);
         await interaction.editReply("Sorry, I couldn't process your request.");
+      }
+    } else if (interaction.commandName === "imagine") {
+      const prompt = interaction.options.getString("prompt");
+      await interaction.deferReply(); // Acknowledge the interaction
+      try {
+        const image = await openai.images.generate({
+          model: "dall-e-3",
+          prompt: prompt,
+        });
+
+        const imageUrl = image.data[0].url;
+        const response = await axios.get(imageUrl, {
+          responseType: "arraybuffer",
+        });
+        const buffer = Buffer.from(response.data, "binary");
+        const filePath = path.join(__dirname, "image.png");
+
+        fs.writeFileSync(filePath, buffer);
+
+        await interaction.editReply({ files: [filePath] });
+      } catch (error) {
+        console.error(error);
+        await interaction.editReply("Sorry, I couldn't generate the image.");
       }
     }
   }
