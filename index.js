@@ -30,9 +30,7 @@ client.on("messageCreate", (message) => {
 
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isChatInputCommand()) {
-    if (interaction.commandName === "ping") {
-      interaction.reply("Pong!");
-    } else if (interaction.commandName === "chat") {
+    if (interaction.commandName === "chat") {
       const prompt = interaction.options.getString("prompt");
       await interaction.deferReply(); // Acknowledge the interaction
       try {

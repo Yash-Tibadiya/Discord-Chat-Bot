@@ -6,10 +6,6 @@ const CLIENT_ID = process.env.CLIENT_ID;
 
 const commands = [
   {
-    name: "ping",
-    description: "Replies with Pong!!",
-  },
-  {
     name: "chat",
     description: "Ask anything to OpenAI",
     options: [
